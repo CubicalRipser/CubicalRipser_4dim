@@ -48,15 +48,15 @@ enum calculation_method { LINKFIND, COMPUTEPAIRS};
 
 void print_usage_and_exit(int exit_code) {
 	std::cerr << "Usage: "
-	          << "CR3 "
+	          << "CR4 "
 	          << "[options] [input_filename]" << std::endl
 	          << std::endl
 	          << "Options:" << std::endl
 	          << std::endl
 	          << "  --help           print this screen" << std::endl
 	          << "  --format         use the specified file format for the input. Options are:" << std::endl
-	          << "                     dipha          (distance matrix in DIPHA file format; default)" << std::endl
-	          << "                     perseus        (distance matrix in Perseus file format)" << std::endl
+	          << "                     dipha          (voxel matrix in DIPHA file format; default)" << std::endl
+	          << "                     perseus        (voxel matrix in Perseus file format)" << std::endl
 	          << "  --threshold <t>  compute cubical complexes up to birth time <t>" << std::endl
 	          << "  --method         method to compute the persistent homology of the cubical complexes. Options are" << std::endl
 	          << "                     link_find      (calculating the 0-dim PP, use 'link_find' algorithm; default)" << std::endl
@@ -70,7 +70,7 @@ void print_usage_and_exit(int exit_code) {
 int main(int argc, char** argv){
 
 	const char* filename = nullptr;
-	string output_filename = "answer_3dim.diagram"; //default name
+	string output_filename = "answer_4dim.diagram"; //default name
 	file_format format = DIPHA;
 	calculation_method method = LINKFIND;
 	double threshold = 99999;
