@@ -1,6 +1,4 @@
 //ComputePairs.cpp
-//#define PRINT_PERSISTENCE_PAIRS
-
 
 #include <iostream>
 #include <algorithm>
@@ -16,20 +14,12 @@
 
 using namespace std;
 
-
-	// DenseCubicalGrids* dcg;
-	// ColumnsToReduce* ctr;
-	// hash_map<int, int> pivot_column_index;
-	// int ax, ay;
-	// int dim;
-	// const int mode = 1;
-	// vector<WritePairs> *wp;
-
-ComputePairs::ComputePairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vector<WritePairs> &_wp){
+ComputePairs::ComputePairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vector<WritePairs> &_wp, const bool _print){
 	dcg = _dcg;
 	ctr = _ctr;
-	dim = _ctr->dim;
+	dim = _ctr -> dim;
 	wp = &_wp;
+	print = _print;
 
 	ax = _dcg -> ax;
 	ay = _dcg -> ay;
@@ -38,29 +28,24 @@ ComputePairs::ComputePairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vecto
 }
 
 void ComputePairs::compute_pairs_main(){
-#ifdef PRINT_PERSISTENCE_PAIRS
-	cout << "persistence intervals in dim " << dim << ":" << endl;
-#endif
-	int printlowerlimit=000;
-	int printupperlimit=6000;
-	bool lineStart=true;
+	if(print == true){
+		cout << "persistence intervals in dim " << dim << ":" << endl;
+	}
 
 	vector<BirthdayIndex> coface_entries;
 	SimplexCoboundaryEnumerator cofaces;
 	unordered_map<int, priority_queue<BirthdayIndex, vector<BirthdayIndex>, BirthdayIndexComparator>> recorded_wc;
 
 	pivot_column_index = hash_map<int, int>();
-	auto ctl_size = ctr->columns_to_reduce.size();
+	auto ctl_size = ctr -> columns_to_reduce.size();
 	pivot_column_index.reserve(ctl_size);
 	recorded_wc.reserve(ctl_size);
 
 	
 	for(int i = 0; i < ctl_size; ++i){ 
-		lineStart = true;
-		auto column_to_reduce = ctr->columns_to_reduce[i]; 
+		auto column_to_reduce = ctr -> columns_to_reduce[i]; 
 		priority_queue<BirthdayIndex, vector<BirthdayIndex>, BirthdayIndexComparator> working_coboundary;
 		double birth = column_to_reduce.getBirthday();
-		//cout << "birth : " << birth <<endl;
 
 		int j = i;
 		BirthdayIndex pivot(0, -1, 0);
@@ -68,14 +53,7 @@ void ComputePairs::compute_pairs_main(){
 		bool goto_found_persistence_pair = false;
 
 		do {
-			// if(printlowerlimit<=i && i<printupperlimit && i!=j){
-			// 	if(lineStart){
-			// 		cout << endl << i << "-";
-			// 		lineStart=false; 
-			// 	} 
-			// 	cout << j << "," ;
-			// }
-			auto simplex = ctr->columns_to_reduce[j];
+			auto simplex = ctr -> columns_to_reduce[j];
 			coface_entries.clear();
 			cofaces.setSimplexCoboundaryEnumerator(simplex, dcg);
 
@@ -86,7 +64,6 @@ void ComputePairs::compute_pairs_main(){
 					if (pivot_column_index.find(coface.getIndex()) == pivot_column_index.end()) {
 						pivot.copyBirthdayIndex(coface);
 						goto_found_persistence_pair = true;// goto (B)
-						//break;
 					} else {
 						might_be_apparent_pair = false;// goto(A)
 					}
@@ -140,16 +117,18 @@ void ComputePairs::compute_pairs_main(){
 
 void ComputePairs::outputPP(int _dim, double _birth, double _death){
 	if(_birth != _death){
-		if(_death != dcg-> threshold){
-#ifdef PRINT_PERSISTENCE_PAIRS
-			cout << "[" <<_birth << "," << _death << ")" << endl;
-#endif
-			wp->push_back(WritePairs(_dim, _birth, _death));
+		if(_death != dcg -> threshold){
+			if(print == true){
+				cout << "[" <<_birth << "," << _death << ")" << endl;
+			}
+
+			wp -> push_back(WritePairs(_dim, _birth, _death));
 		} else {
-#ifdef PRINT_PERSISTENCE_PAIRS
-			cout << "[" << _birth << ", )" << endl;
-#endif
-			wp->push_back(WritePairs(-1, _birth, dcg->threshold));
+			if(print == true){
+				cout << "[" << _birth << ", )" << endl;
+			}
+			
+			wp -> push_back(WritePairs(-1, _birth, dcg -> threshold));
 		}
 	}
 }
@@ -185,12 +164,10 @@ BirthdayIndex ComputePairs::get_pivot(priority_queue<BirthdayIndex, vector<Birth
 
 void ComputePairs::assemble_columns_to_reduce() {
 	++dim;
-	ctr->dim = dim;
+	ctr -> dim = dim;
 
-	cout << "the size of ctr (before assemble_columns_to_reduce) : " << ctr->columns_to_reduce.size() << endl;
-	//cout << "the size of pivot column index : " << pivot_column_index.size() << endl;
 	if (dim == 1) { 
-		ctr->columns_to_reduce.clear();
+		ctr -> columns_to_reduce.clear();
 		for(int w = 1; w <= aw; ++w){
 			for(int z = 1; z <= az; ++z){
 				for (int y = 1; y <= ay; ++y) {
@@ -209,7 +186,7 @@ void ComputePairs::assemble_columns_to_reduce() {
 			}
 		}
 	} else if(dim == 2){ 
-		ctr->columns_to_reduce.clear();
+		ctr -> columns_to_reduce.clear();
 		for(int w = 1; w <= aw; ++w){
 			for(int z = 1; z <= az; ++z){
 				for (int y = 1; y <= ay; ++y) {
@@ -228,7 +205,7 @@ void ComputePairs::assemble_columns_to_reduce() {
 			}
 		}
 	} else if(dim == 3){
-		ctr->columns_to_reduce.clear();
+		ctr -> columns_to_reduce.clear();
 		for(int w = 1; w <= aw; ++w){
 			for(int z = 1; z <= az; ++z){
 				for (int y = 1; y <= ay; ++y) {
@@ -238,7 +215,7 @@ void ComputePairs::assemble_columns_to_reduce() {
 							if (pivot_column_index.find(index) == pivot_column_index.end()) {
 								double birthday = dcg -> getBirthday(index, 3);
 								if (birthday != dcg -> threshold) {
-									ctr->columns_to_reduce.push_back(BirthdayIndex(birthday, index, 3));
+									ctr -> columns_to_reduce.push_back(BirthdayIndex(birthday, index, 3));
 								}
 							}
 						}
@@ -247,10 +224,6 @@ void ComputePairs::assemble_columns_to_reduce() {
 			}
 		}
 	}
-	sort(ctr->columns_to_reduce.begin(), ctr->columns_to_reduce.end(), BirthdayIndexComparator());
-	cout << ctr->columns_to_reduce.size() << endl;
-	/*for(int i = 0; i < ctr->size(); i++){
-		cout << ctr->columns_to_reduce[i].getBirthday() << " : " << ctr->columns_to_reduce[i].getIndex() << endl;
-	}*/
+	sort(ctr -> columns_to_reduce.begin(), ctr -> columns_to_reduce.end(), BirthdayIndexComparator());
 }
 

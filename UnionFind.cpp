@@ -1,7 +1,5 @@
 //UnionFind.cpp
 
-//#define PRINT_PERSISTENCE_PAIRS
-
 #include <iostream>
 #include <algorithm>
 #include <queue>
@@ -12,9 +10,7 @@
 #include "WritePairs.h"
 #include "UnionFind.h"
 
-
 using namespace std;
-
 	
 UnionFind::UnionFind(int moi, DenseCubicalGrids* _dcg) : parent(moi), birthtime(moi), time_max(moi) { // Thie "n" is the number of cubes.
 	dcg = _dcg;
@@ -61,25 +57,16 @@ void UnionFind::link(int x, int y){
 }
 
 
-// int n; // the number of cubes
-// int ctr_moi;
-// int ax, ay, az, aw;
-// DenseCubicalGrids* dcg;
-// ColumnsToReduce* ctr;
-// vector<WritePairs> *wp;
-// double u, v;
-// vector<int64_t> cubes_edges;
-// vector<BirthdayIndex> dim1_simplex_list;
-
-JointPairs::JointPairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vector<WritePairs> &_wp){
+JointPairs::JointPairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vector<WritePairs> &_wp, const bool _print){
 	dcg = _dcg;
-	ax = dcg->ax;
-	ay = dcg->ay;
+	ax = dcg -> ax;
+	ay = dcg -> ay;
 	az = dcg -> az;
 	aw = dcg -> aw;
 	ctr = _ctr; // ctr is "dim0"simplex list.
-	ctr_moi = ctr->max_of_index;
-	n = ctr->columns_to_reduce.size();
+	ctr_moi = ctr -> max_of_index;
+	n = ctr -> columns_to_reduce.size();
+	print = _print;
 
 	wp = &_wp;
 
@@ -102,18 +89,16 @@ JointPairs::JointPairs(DenseCubicalGrids* _dcg, ColumnsToReduce* _ctr, vector<Wr
 }
 
 void JointPairs::joint_pairs_main(){
-	//cubes_edges.reserve(2);
 	UnionFind dset(ctr_moi, dcg);
-	ctr->columns_to_reduce.clear();
-	ctr->dim = 1;
+	ctr -> columns_to_reduce.clear();
+	ctr -> dim = 1;
 	double min_birth = dcg -> threshold;
-#ifdef PRINT_PERSISTENCE_PAIRS
-	cout << "persistence intervals in dim " << 0 << ":" << endl;
-#endif
 
+	if(print == true){
+		cout << "persistence intervals in dim " << 0 << ":" << endl;
+	}
+	
 	for(BirthdayIndex e : dim1_simplex_list){
-		//cubes_edges.clear();
-
 		int index = e.getIndex();
 		int cx = index & 0x7f;
 		int cy = (index >> 7) & 0x7f;
@@ -125,19 +110,19 @@ void JointPairs::joint_pairs_main(){
 		switch(cm){
 		case 0:
 			ce0 =  cx | (cy << 7) | (cz << 14) | (cw << 21);
-			ce1 =  (cx+1) | (cy << 7) | (cz << 14) | (cw << 21);
+			ce1 =  (cx + 1) | (cy << 7) | (cz << 14) | (cw << 21);
 			break;
 		case 1:
 			ce0 =  cx | (cy << 7) | (cz << 14) | (cw << 21);
-			ce1 =  cx | ((cy+1) << 7) | (cz << 14) | (cw << 21);
+			ce1 =  cx | ((cy + 1) << 7) | (cz << 14) | (cw << 21);
 			break;
 		case 2:
 			ce0 =  cx | (cy << 7) | (cz << 14) | (cw << 21);
-			ce1 =  cx | (cy << 7) | ((cz+1) << 14) | (cw << 21);
+			ce1 =  cx | (cy << 7) | ((cz + 1) << 14) | (cw << 21);
 			break;
 		case 3:
 			ce0 =  cx | (cy << 7) | (cz << 14) | (cw << 21);
-			ce1 =  cx | (cy << 7) | (cz << 14) | ((cw+1) << 21);
+			ce1 =  cx | (cy << 7) | (cz << 14) | ((cw + 1) << 21);
 			break;
 		}
 		u = dset.find(ce0);
@@ -149,24 +134,26 @@ void JointPairs::joint_pairs_main(){
 		if(u != v){
 			double birth = max(dset.birthtime[u], dset.birthtime[v]);
 			double death = max(dset.time_max[u], dset.time_max[v]);
-			//cout << "birth : death = ( " << birth << " , " << death << " )" <<endl;
+
 			if(birth == death){
 				dset.link(u, v);
 			} else {
-#ifdef PRINT_PERSISTENCE_PAIRS
-				cout << "[" << birth << "," << death << ")" << endl;
-#endif
-				wp->push_back(WritePairs(0, birth, death));
+				if(print == true){
+					cout << "[" << birth << "," << death << ")" << endl;
+				}
+				
+				wp -> push_back(WritePairs(0, birth, death));
 				dset.link(u, v);
 			}
 		} else { // If two values have same "parent", these are potential edges which make a 2-simplex.
-			ctr->columns_to_reduce.push_back(e);
+			ctr -> columns_to_reduce.push_back(e);
 		}
 	}
 
-#ifdef PRINT_PERSISTENCE_PAIRS
-	cout << "[" << min_birth << ", )" << endl;
-#endif
-	wp->push_back(WritePairs(-1, min_birth, dcg->threshold));
-	sort(ctr->columns_to_reduce.begin(), ctr->columns_to_reduce.end(), BirthdayIndexComparator());
+	if(print == true){
+		cout << "[" << min_birth << ", )" << endl;
+	}
+	
+	wp -> push_back(WritePairs(-1, min_birth, dcg->threshold));
+	sort(ctr -> columns_to_reduce.begin(), ctr -> columns_to_reduce.end(), BirthdayIndexComparator());
 }
