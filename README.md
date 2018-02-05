@@ -50,6 +50,8 @@ To execute CubicalRipser,
 
 	--print
 
+        print persistence pairs on your console.
+
 ## about speed
 
 In 2 and 3 dimensional case, we believe that CubicalRipser is much faster than DIPHA.
