@@ -39,13 +39,13 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _threshold, file_format _format)  {
+DenseCubicalGrids::DenseCubicalGrids(const string& filename, double _threshold, file_format _format)  {
 	
 	threshold = _threshold;
 	format = _format;
 
 	if(format == DIPHA){ // ???.complex, DIPHA format
-		std::ifstream reading_file; 
+		ifstream reading_file; 
 		cout << filename << endl;
 
 		ifstream fin( filename, ios::in | ios::binary ); 
@@ -91,7 +91,7 @@ DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _thresh
 			}
 		}
 		fin.close();
-	}  else if(format == PERSEUS){// PERCEUS format
+	}  else if(format == PERSEUS){ // PERCEUS format
 
 		ifstream reading_file; 
 		reading_file.open(filename.c_str(), ios::in); 
@@ -217,5 +217,3 @@ double DenseCubicalGrids::getBirthday(int index, int dim){
 		}
 		return threshold;
 }
-
-
