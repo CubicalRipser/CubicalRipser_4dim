@@ -67,7 +67,7 @@ DenseCubicalGrids::DenseCubicalGrids(const string& filename, double _threshold, 
 		az = d;
 		fin.read( ( char * ) &d, sizeof( int64_t ) );
 		aw = d;
-		assert(0 < ax && ax < 510 && 0 < ay && ay < 510 && 0 < az && az < 510);
+		assert(0 < ax && ax < 120 && 0 < ay && ay < 120 && 0 < az && az < 120 && 0 < aw && aw << 120);
 		cout << "ax : ay : az : aw = " << ax << " : " << ay << " : " << az << " : " << aw << endl;
 
 		double dou;
@@ -107,7 +107,7 @@ DenseCubicalGrids::DenseCubicalGrids(const string& filename, double _threshold, 
 		az = atoi(reading_line_buffer.c_str());
 		getline(reading_file, reading_line_buffer); 
 		aw = atoi(reading_line_buffer.c_str());
-		assert(0 < ax && ax < 510 && 0 < ay && ay < 510 && 0 < az && az < 510);
+		assert(0 < ax && ax < 120 && 0 < ay && ay < 120 && 0 < az && az < 120 && 0 < aw && aw << 120);
 		cout << "ax : ay : az : aw = " << ax << " : " << ay << " : " << az << " : " << aw << endl;
 
 		for(int w = 0; w < aw + 2; ++w){
