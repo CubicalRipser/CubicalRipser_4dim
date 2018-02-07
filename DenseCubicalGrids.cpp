@@ -28,6 +28,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
+#include <cassert>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -43,19 +44,21 @@ DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _thresh
 	threshold = _threshold;
 	format = _format;
 
-	if(format == DIPHA){// ???.complex, DIPHA format
+	if(format == DIPHA){ // ???.complex, DIPHA format
 		std::ifstream reading_file; 
+		cout << filename << endl;
 
 		ifstream fin( filename, ios::in | ios::binary ); 
 		int64_t d;
 
 		fin.read( ( char * ) &d, sizeof( int64_t ) ); // magic number
-		//assert(d == 8067171840);
+		assert(d == 8067171840);
 		fin.read( ( char * ) &d, sizeof( int64_t ) ); // type number
-		//assert(d == 1);
+		assert(d == 1);
 		fin.read( ( char * ) &d, sizeof( int64_t ) ); //data num
 		fin.read( ( char * ) &d, sizeof( int64_t ) ); // dim 
 		dim = d;
+		assert(dim == 4);
 		fin.read( ( char * ) &d, sizeof( int64_t ) );
 		ax = d;
 		fin.read( ( char * ) &d, sizeof( int64_t ) );
@@ -64,7 +67,7 @@ DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _thresh
 		az = d;
 		fin.read( ( char * ) &d, sizeof( int64_t ) );
 		aw = d;
-		//assert(0 < ax && ax < 510 && 0 < ay && ay < 510 && 0 < az && az < 510);
+		assert(0 < ax && ax < 510 && 0 < ay && ay < 510 && 0 < az && az < 510);
 		cout << "ax : ay : az : aw = " << ax << " : " << ay << " : " << az << " : " << aw << endl;
 
 		double dou;
@@ -90,20 +93,22 @@ DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _thresh
 		fin.close();
 	}  else if(format == PERSEUS){// PERCEUS format
 
-		std::ifstream reading_file; 
-		reading_file.open(filename.c_str(), std::ios::in); 
+		ifstream reading_file; 
+		reading_file.open(filename.c_str(), ios::in); 
 
-		std::string reading_line_buffer; 
-		std::getline(reading_file, reading_line_buffer); 
-		dim = std::atoi(reading_line_buffer.c_str());
-		std::getline(reading_file, reading_line_buffer); 
-		ax = std::atoi(reading_line_buffer.c_str()); 
-		std::getline(reading_file, reading_line_buffer); 
-		ay = std::atoi(reading_line_buffer.c_str()); 
-		std::getline(reading_file, reading_line_buffer); 
-		az = std::atoi(reading_line_buffer.c_str());
-		std::getline(reading_file, reading_line_buffer); 
-		aw = std::atoi(reading_line_buffer.c_str());
+		string reading_line_buffer; 
+		getline(reading_file, reading_line_buffer); 
+		dim = atoi(reading_line_buffer.c_str());
+		getline(reading_file, reading_line_buffer); 
+		ax = atoi(reading_line_buffer.c_str()); 
+		getline(reading_file, reading_line_buffer); 
+		ay = atoi(reading_line_buffer.c_str()); 
+		getline(reading_file, reading_line_buffer); 
+		az = atoi(reading_line_buffer.c_str());
+		getline(reading_file, reading_line_buffer); 
+		aw = atoi(reading_line_buffer.c_str());
+		assert(0 < ax && ax < 510 && 0 < ay && ay < 510 && 0 < az && az < 510);
+		cout << "ax : ay : az : aw = " << ax << " : " << ay << " : " << az << " : " << aw << endl;
 
 		for(int w = 0; w < aw + 2; ++w){
 			for(int z = 0; z < az + 2; ++z){
@@ -111,8 +116,8 @@ DenseCubicalGrids::DenseCubicalGrids(const std::string& filename, double _thresh
 					for (int x = 0; x < ax + 2; ++x) { 
 						if(0 < x && x <= ax && 0 < y && y <= ay && 0 < z && z <= az && 0 < w && w <= aw){ 
 							if (!reading_file.eof()) { 
-								std::getline(reading_file, reading_line_buffer); 
-								dense4[x][y][z][w] = std::atoi(reading_line_buffer.c_str()); 
+								getline(reading_file, reading_line_buffer); 
+								dense4[x][y][z][w] = atoi(reading_line_buffer.c_str()); 
 								if (dense4[x][y][z][w] == -1) { 
 									dense4[x][y][z][w] = threshold; 
 								} 
